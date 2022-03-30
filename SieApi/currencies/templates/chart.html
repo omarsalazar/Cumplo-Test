@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js"></script>
+    <body>
+    <h1>Moneda: {{currency}}</h1>
+    <br>
+    <h1>De {{start_date}} a {{end_date}}</h1>
+    <h1>Máximo: {{data.max}}</h1>
+    <h1>Minimo: {{data.min}}</h1>
+    <h1>Promedio: {{data.average}}</h1>
+    {% if error %}
+        <div>
+            <h1>{{error}}</h1>
+        </div>
+    {% endif %}
+
+    <canvas id="myChart" style="width:100%;max-width:600px"></canvas>
+    <form method = "POST">
+        {{ form }}
+        {%csrf_token%}
+        <input type = "submit" value = "Submit">
+    </form>
+
+    <script>
+        var data = {{ data.data|safe }};
+        var _min = {{ data.min|safe }};
+        var _max = {{ data.max|safe }};
+        var xValues = [];
+        var yValues = [];
+
+        for (var i = 0; i < data.length; ++i) {
+            xValues.push(data[i].fecha)
+            yValues.push(parseFloat(data[i].dato))
+        }
+
+        new Chart("myChart", {
+          type: "line",
+          data: {
+            labels: xValues,
+            datasets: [{
+              fill: false,
+              lineTension: 0,
+              backgroundColor: "rgba(0,0,255,1.0)",
+              borderColor: "rgba(0,0,255,0.1)",
+              data: yValues
+            }]
+          },
+          options: {
+            legend: {display: false},
+            scales: {
+              yAxes: [{ticks: {min: _min, max: _max}}],
+            }
+          }
+        });
+    </script>
+    </body>
+</html>
+
